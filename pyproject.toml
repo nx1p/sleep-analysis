@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "sleep-analysis"
+version = "0.1.0"
+description = ""
+authors = ["nx1p <email@marci.tech>"]
+readme = "README.md"
+packages = [{include = "sleep_analysis"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+rich = "^13.7.1"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
