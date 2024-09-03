@@ -101,6 +101,9 @@ def import_to_database(records):
 
 
 def setup_database(host, user, password, dbname):
+    new_db_created = False
+    new_table_created = False
+
     # Connect to default database to create new database
     conn = psycopg2.connect(
         host=host,
@@ -115,6 +118,7 @@ def setup_database(host, user, password, dbname):
     cur.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{dbname}'")
     if cur.fetchone() is None:
         cur.execute(f"CREATE DATABASE {dbname}")
+        new_db_created = True
     
     cur.close()
     conn.close()
@@ -128,25 +132,44 @@ def setup_database(host, user, password, dbname):
     )
     cur = conn.cursor()
 
-    # Create table if it doesn't exist
+    # Check if table exists
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS sleep_records (
-            start_time TIMESTAMP WITH TIME ZONE PRIMARY KEY,
-            end_time TIMESTAMP WITH TIME ZONE,
-            sleep_duration FLOAT,
-            cycles INTEGER,
-            deep_sleep FLOAT,
-            time_awake INTEGER,
-            location_hash TEXT,
-            comment TEXT
+        SELECT EXISTS (
+            SELECT FROM information_schema.tables 
+            WHERE table_name = 'sleep_records'
         )
     """)
+    table_exists = cur.fetchone()[0]
+
+    if not table_exists:
+        # Create table if it doesn't exist
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS sleep_records (
+                start_time TIMESTAMP WITH TIME ZONE PRIMARY KEY,
+                end_time TIMESTAMP WITH TIME ZONE,
+                sleep_duration FLOAT,
+                cycles INTEGER,
+                deep_sleep FLOAT,
+                time_awake INTEGER,
+                location_hash TEXT,
+                comment TEXT
+            )
+        """)
+        new_table_created = True
 
     conn.commit()
     cur.close()
     conn.close()
 
-    print(f"Database '{dbname}' and table 'sleep_records' set up successfully.")
+    if new_db_created and new_table_created:
+        print(f"Database '{dbname}' and table 'sleep_records' set up successfully.")
+    elif new_db_created:
+        print(f"Database '{dbname}' created successfully. Table 'sleep_records' already existed.")
+    elif new_table_created:
+        print(f"Table 'sleep_records' created successfully in existing database '{dbname}'.")
+    else:
+        print(f"Database '{dbname}' and table 'sleep_records' are already set up.")
+
 
 
 def process_sleep_data(csv_file):
