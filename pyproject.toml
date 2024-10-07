@@ -15,7 +15,6 @@ requests = "^2.32.3"
 psycopg2-binary = "^2.9.9"
 aiohttp = "^3.10.9"
 asyncpg = "^0.29.0"
-py7zr = "^0.22.0"
 patool = "^3.0.1"
 
 

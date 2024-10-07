@@ -169,7 +169,7 @@ async def setup_database(host, user, password, dbname):
     print(f"Table 'sleep_records' is set up in database '{dbname}'.")
 async def import_to_database(records):
     conn = await asyncpg.connect(
-        host="192.168.0.52",
+        host="db",
         user="postgres",
         password="dev_password",
         database="sleep_data"
@@ -233,7 +233,7 @@ async def process_zip_data(zip_data):
         return False, 0, []
 
 async def main(zip_data=None):
-    host = "192.168.0.52"
+    host = "db"
     user = "postgres"
     password = "dev_password"
     dbname = "sleep_data"

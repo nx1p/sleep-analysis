@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    #volumes:
+    #  - ./data:/app/data
+    environment:
+      - DISCORD_WEBHOOK=
+    #  - DATA_DIR=/app
+    ports:
+      - 9292:9292
+    restart: always
+  
+  db:
+    image: postgres
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb
+    environment:
+      POSTGRES_PASSWORD: dev_password
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
