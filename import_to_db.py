@@ -37,22 +37,27 @@ def format_sleep_record(record):
     start_timestamp = int(record['start_time'].timestamp())
     end_timestamp = int(record['end_time'].timestamp())
     duration = record['sleep_duration']
+    hours, minutes = divmod(int(duration * 60), 60)
     
-    if duration > 0:
+    is_manually_added = "Manually added" in record['comment']
+
+    if duration > 0 and not is_manually_added:
         time_awake_percent = (record['time_awake'] / 60) / duration * 100 if record['time_awake'] is not None else 0
         deep_sleep_percent = record['deep_sleep'] * 100 if record['deep_sleep'] is not None else 0
     else:
         time_awake_percent = 0
         deep_sleep_percent = 0
 
-    return {
-        "name": f"Sleep Record: <t:{start_timestamp}:f>",
-        "value": f"End Time: <t:{end_timestamp}:t>\n"
-                 f"Duration: {duration:.2f} hours\n"
-                 f"Time Awake: {time_awake_percent:.2f}%\n"
-                 f"Deep Sleep: {deep_sleep_percent:.2f}%"
-    }
+    awake_text = "N/A (Manually added)" if is_manually_added else f"{time_awake_percent:.1f}% {format_progress_bar(time_awake_percent) if time_awake_percent != 0 else ''}"
+    deep_sleep_text = "N/A (Manually added)" if is_manually_added else f"{deep_sleep_percent:.1f}% {format_progress_bar(deep_sleep_percent) if deep_sleep_percent != 0 else ''}"
 
+    return {
+        "name": f"🌙 Sleep Record: <t:{start_timestamp}:f>",
+        "value": f"⏰ End: <t:{end_timestamp}:t>\n"
+                 f"⌛ Duration: {hours}h {minutes}m\n"
+                 f"👀 Awake: {awake_text}\n"
+                 f"💤 Deep sleep: {deep_sleep_text}\n"
+    }
 def verify_zip(zip_data):
     try:
         # Create a temporary directory to extract files

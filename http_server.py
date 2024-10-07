@@ -24,9 +24,9 @@ async def send_discord_notification(message, new_record_details=None):
     if DISCORD_WEBHOOK:
         async with aiohttp.ClientSession() as session:
             embed = {
-                "title": "Sleep Data Update",
+                "title": "Sleep",
                 "description": message,
-                "color": 0x00ff00,
+                "color": 0x8A2BE2,
                 "fields": []
             }
             
@@ -41,6 +41,11 @@ async def send_discord_notification(message, new_record_details=None):
                     print(f"Failed to send Discord notification. Status: {response.status}")
     else:
         print("Discord notification not sent: DISCORD_WEBHOOK is not set")
+
+async def handle_sleep_start(request):
+    print("Received sleep-start request")
+    await send_discord_notification("Sleep tracking started!")
+    return web.Response(text="Sleep tracking start recorded.")
 
 async def handle_upload(request):
     print("Received upload request")
@@ -60,7 +65,7 @@ async def handle_upload(request):
     if success:
         print("Processing completed successfully")
         if new_records > 0:
-            await send_discord_notification(f"New sleep data processed! {new_records} new records added.", new_record_details)
+            await send_discord_notification(f"New sleep data! {new_records} new records.", new_record_details)
         else:
             await send_discord_notification("Sleep tracking likely cancelled. No new sleep data found.")
         return web.Response(text="ZIP file uploaded and processed successfully.")
@@ -77,7 +82,13 @@ async def process_sleep_data(zip_data):
 
 app = web.Application(client_max_size=1024**3)  # Set to 1GB
 app.router.add_post('/upload', handle_upload)
+app.router.add_get('/sleep-start', handle_sleep_start)
 
 if __name__ == '__main__':
-    print("Starting web server on http://0.0.0.0:8080")
-    web.run_app(app, host='0.0.0.0', port=8080)
+    print("Starting web server on http://0.0.0.0:9292")
+    web.run_app(app, host='0.0.0.0', port=9292)
+
+async def handle_sleep_start(request):
+    print("Received sleep-start request")
+    await send_discord_notification("Sleep tracking has started!")
+    return web.Response(text="Sleep tracking start recorded.")

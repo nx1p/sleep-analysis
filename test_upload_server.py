@@ -2,7 +2,7 @@ import aiohttp
 import asyncio
 
 async def test_upload():
-    url = 'http://localhost:8080/upload'
+    url = 'http://localhost:9292/upload'
     filename = 'sleep-export.zip'
 
     async with aiohttp.ClientSession() as session:
