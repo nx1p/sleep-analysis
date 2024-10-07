@@ -174,11 +174,11 @@ def process_sleep_data(csv_file):
     return records
 
 
-def process_zip_data(zip_data):
+async def process_zip_data(zip_data):
     zip_file = io.BytesIO(zip_data)
     if verify_zip(zip_file):
         records = process_sleep_data('sleep-export.csv')
-        total_records, new_records = import_to_database(records)
+        total_records, new_records = await import_to_database(records)
         os.remove('sleep-export.csv')
         print(f"Sleep data processed successfully. {total_records} records processed, {new_records} new records added.")
         return True
